@@ -12,17 +12,18 @@ defaults:
 
 jobs:
   check:
-    name: Run checks for periodicity-detection on ubuntu with python 3.7
+    name: Run checks for periodicity-detection on ubuntu with python 3.9
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
       - name: Setup Miniconda
-        uses: conda-incubator/setup-miniconda@v3.0.4
+        uses: conda-incubator/setup-miniconda@v3.1.1
         with:
           use-mamba: true
           auto-update-conda: true
-          python-version: "3.7"
+          python-version: "3.9"
+          channels: "defaults"
       - name: Install dependencies
         run: |
           pip install -r requirements.dev
@@ -40,17 +41,18 @@ jobs:
       max-parallel: 3
       matrix:
         os: [ubuntu-latest] # [ubuntu-latest, windows-latest, macOS-latest]
-        python_version: ["3.7", "3.11"]
+        python_version: ["3.9", "3.13"]
       fail-fast: false
 
     steps:
     - uses: actions/checkout@v4
     - name: Setup Miniconda
-      uses: conda-incubator/setup-miniconda@v3.0.4
+      uses: conda-incubator/setup-miniconda@v3.1.1
       with:
         use-mamba: true
         auto-update-conda: true
         python-version: ${{ matrix.python_version }}
+        channels: "defaults"
     - name: Install dependencies
       run: |
         pip install -r requirements.dev
@@ -59,7 +61,7 @@ jobs:
         python setup.py test
     - name: Upload Coverage to Codecov
       if: ${{ matrix.os == 'ubuntu-latest' }}
-      uses: codecov/codecov-action@v4
+      uses: codecov/codecov-action@v5
       env:
         CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
       with:

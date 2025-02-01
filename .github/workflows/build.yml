@@ -13,17 +13,18 @@ defaults:
 
 jobs:
   check:
-    name: Run checks for periodicity-detection on ubuntu with python 3.7
+    name: Run checks for periodicity-detection on ubuntu with python 3.9
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
       - name: Setup Miniconda
-        uses: conda-incubator/setup-miniconda@v3.0.4
+        uses: conda-incubator/setup-miniconda@v3.1.1
         with:
           use-mamba: true
           auto-update-conda: true
-          python-version: "3.7"
+          python-version: "3.9"
+          channels: "defaults"
       - name: Install dependencies
         run: |
           pip install -r requirements.dev
@@ -41,17 +42,18 @@ jobs:
       max-parallel: 3
       matrix:
         os: [ubuntu-latest] # [ubuntu-latest, windows-latest, macOS-latest]
-        python_version: ["3.7", "3.8", "3.9", "3.10", "3.11"]
+        python_version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
       fail-fast: false
 
     steps:
     - uses: actions/checkout@v4
     - name: Setup Miniconda
-      uses: conda-incubator/setup-miniconda@v3.0.4
+      uses: conda-incubator/setup-miniconda@v3.1.1
       with:
         use-mamba: true
         auto-update-conda: true
         python-version: ${{ matrix.python_version }}
+        channels: "defaults"
     - name: Install dependencies
       run: |
         pip install -r requirements.dev
@@ -82,7 +84,7 @@ jobs:
         namedLogo: pytest
     - name: Upload Coverage to Codecov
       if: ${{ matrix.python_version == '3.11' && matrix.os == 'ubuntu-latest' }}
-      uses: codecov/codecov-action@v4
+      uses: codecov/codecov-action@v5
       env:
         CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
       with:
@@ -100,11 +102,12 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Setup Miniconda
-      uses: conda-incubator/setup-miniconda@v3.0.4
+      uses: conda-incubator/setup-miniconda@v3.1.1
       with:
         use-mamba: true
         auto-update-conda: true
-        python-version: 3.7
+        python-version: 3.9
+        channels: "defaults"
     - name: Build source distribution
       run: |
         python setup.py sdist
@@ -128,7 +131,7 @@ jobs:
         uses: RalfG/python-wheels-manylinux-build@v0.7.1-manylinux2014_x86_64
         with:
           # our wheel is purely python, so this creates a *-none-any.wheel and other versions are not required for now
-          python-versions: 'cp37-cp37m'
+          python-versions: 'cp39-cp39m'
       - name: List packages
         run: |
           ls -alh dist
@@ -158,4 +161,4 @@ jobs:
         find dist -type f -exec mv {} dist/ \;
         find dist/* -type d -exec rmdir {} \; || true
     - name: Publish package to PyPI
-      uses: pypa/gh-action-pypi-publish@v1.9.0
+      uses: pypa/gh-action-pypi-publish@v1.12.4
